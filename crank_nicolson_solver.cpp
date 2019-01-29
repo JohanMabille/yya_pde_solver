@@ -1,7 +1,7 @@
 #include "crank_nicolson_solver.hpp"
 using namespace std;
 
-
+// There is a more efficient algorithm to solve a tridiag system
 void gauss(vector<vector<double>>& augmented_matrix) {
     int n = augmented_matrix.size();
     for(int i=0; i<n; ++i) {
@@ -66,7 +66,8 @@ void crank_nicolson_solver::solve() {
         0.5*(s*s-r_val)*(f_next-f_prev)/(2*dx) + r_val*f_curr;
     }
     
-
+    // Inefficient. Why storing N x N values while you know the
+    // matrix is tridiagonal?
     vector<vector<double>> augmented_matrix(n);
     for(int i=0;i<n;i++) {
         augmented_matrix[i].resize(n+1);
@@ -87,14 +88,17 @@ void crank_nicolson_solver::solve() {
             double s = sigma(x,t);
             double r_val = r(x,t);
 
-
+            // This is due to a typo in the subject and won't be considered as an
+            // error
             augmented_matrix[i][i+1] = -0.5*s*s*dt/(dx*dx)*theta + 
-            0.5*(s*s-r_val)*dt/(2*dx)*theta;
+            (0.5*s*s-r_val)*dt/(2*dx)*theta;
 
             augmented_matrix[i][i] = -0.5*s*s*(-2)*dt/(dx*dx)*theta + r_val*theta*dt + 1;
 
+            // This is due to a typo in the subject and won't be considered as an
+            // error
             augmented_matrix[i][i-1] = -0.5*s*s*dt/(dx*dx)*theta - 
-            0.5*(s*s-r_val)*dt/(2*dx)*theta;
+            (0.5*s*s-r_val)*dt/(2*dx)*theta;
             
             augmented_matrix[i][n] = answer[t+1].get_val_at_index(i) - (1-theta)*L[i]*dt;
         }
@@ -113,8 +117,10 @@ void crank_nicolson_solver::solve() {
             double x = answer[t].get_xval(i);
             double s = sigma(x,T);
             double r_val = r(x,T);
+            // This is due to a typo in the subject and won't be considered as an
+            // error
             L[i] = -0.5*s*s*(f_next-2*f_curr+f_prev)/(dx*dx) + 
-            0.5*(s*s-r_val)*(f_next-f_prev)/(2*dx) + r_val*f_curr;
+            (0.5*s*s-r_val)*(f_next-f_prev)/(2*dx) + r_val*f_curr;
         }
     }
 }

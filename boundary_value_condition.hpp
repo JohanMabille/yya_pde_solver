@@ -1,12 +1,21 @@
 #include <vector>
+// 
 using std::vector;
 
 #ifndef BOUNDARY_VALUE_CONDITION
 #define BOUNDARY_VALUE_CONDITION
 
+// entity semantic is missing:
+// - no virtual destructor, so even if you call delete bv, you'll have
+// a potential leak ecause data members of inheriting classes won't be
+// deleted
+// - copy and move constructors / assignment operators are not deleted,
+// so incomplete copy (slicing) is possible.
 class boundary_value_condition {
 
     public:
+
+    // Again, public data 
     int N, T;
     vector<double> v0, v1;
     boundary_value_condition(int N,int T);
